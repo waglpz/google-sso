@@ -1,0 +1,69 @@
+{
+    "name": "waglpz/google-sso",
+    "description": "Single sign on with Google. Minimal implementation.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alexander Hutorezki",
+            "email": "huto@wa-gruppe.de"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": "^7.4",
+        "ext-json": "*",
+        "google/apiclient": "^2.7"
+    },
+    "require-dev": {
+        "ifsnop/mysqldump-php": "^2.9",
+        "phpstan/phpstan": "^0.12",
+        "phpstan/phpstan-deprecation-rules": "^0.12",
+        "phpstan/phpstan-doctrine": "^0.12",
+        "phpstan/phpstan-phpunit": "^0.12",
+        "phpstan/phpstan-strict-rules": "^0.12",
+        "phpstan/phpstan-symfony": "^0.12",
+        "phpstan/phpstan-webmozart-assert": "^0.12",
+        "phpunit/phpunit": "^9.1",
+        "roave/security-advisories": "dev-master",
+        "squizlabs/php_codesniffer": "^3.5",
+        "doctrine/coding-standard": "^8.2"
+    },
+    "conflict": {
+    },
+    "autoload": {
+        "psr-4": {
+            "GoogleSSO\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "GoogleSSO\\Tests\\": "tests/"
+        }
+    },
+    "replace": {
+    },
+    "scripts": {
+        "cs-check": "phpcs -p --parallel=100",
+        "cs-fix": "phpcbf -p --parallel=100",
+        "test-all": "phpunit --colors=always tests",
+        "analyse": [
+            "phpstan analyse --configuration=phpstan.neon config/ src/ tests/ --level max"
+        ],
+        "check": [
+            "@cs-check",
+            "@analyse",
+            "@test"
+        ],
+        "test": [
+            "@test-all"
+        ],
+        "post-update-cmd": "Google_Task_Composer::cleanup"
+    },
+    "extra": {
+        "google/apiclient-services": [
+            "Drive"
+        ]
+    }
+}
