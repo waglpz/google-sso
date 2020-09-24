@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace GoogleSSO;
+namespace Waglpz\GoogleSSO;
 
 interface GoogleSSOPooreable
 {

@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namespace GoogleSSO\Tests;
+namespace Waglpz\GoogleSSO\Tests;
 
-use Google_Client;
-use GoogleSSO\GoogleSSO;
 use PHPUnit\Framework\TestCase;
+use Waglpz\GoogleSSO\GoogleSSO;
 
 final class GoogleSSOTest extends TestCase
 {
@@ -34,7 +33,7 @@ final class GoogleSSOTest extends TestCase
     /** @test */
     public function authorizationUrlCreated(): void
     {
-        $googleClient = $this->createMock(Google_Client::class);
+        $googleClient = $this->createMock(\Google_Client::class);
         $googleClient->expects(self::once())->method('setRedirectUri')->with('http://test-server');
         $googleClient->expects(self::once())->method('setAccessType')->with('online');
         $googleClient->expects(self::once())->method('setScopes')->with(['email', 'profile']);
@@ -54,7 +53,7 @@ final class GoogleSSOTest extends TestCase
         $this->expectExceptionCode(500);
         $this->expectExceptionMessage('Unexpected result from Google.');
 
-        $googleClient = $this->createMock(Google_Client::class);
+        $googleClient = $this->createMock(\Google_Client::class);
         $googleClient->expects(self::once())
                      ->method('fetchAccessTokenWithAuthCode')->with('code-ABC')
                      ->willReturn([]);
@@ -76,7 +75,7 @@ final class GoogleSSOTest extends TestCase
             )
         );
 
-        $googleClient = $this->createMock(Google_Client::class);
+        $googleClient = $this->createMock(\Google_Client::class);
         $sso          = new GoogleSSO($config, $googleClient);
         $sso->fetchAccountDataUsingAuthorizationCode('code-ABC');
     }
@@ -88,7 +87,7 @@ final class GoogleSSOTest extends TestCase
         $this->expectExceptionCode(500);
         $this->expectExceptionMessage('Unexpected Google Token result.');
 
-        $googleClient = $this->createMock(Google_Client::class);
+        $googleClient = $this->createMock(\Google_Client::class);
         $googleClient->expects(self::once())
                      ->method('fetchAccessTokenWithAuthCode')->with('code-ABC')
                      ->willReturn(['id_token' => 'abc']);
@@ -102,7 +101,7 @@ final class GoogleSSOTest extends TestCase
         $this->expectException(\JsonException::class);
         $this->expectExceptionMessage('Syntax error');
 
-        $googleClient = $this->createMock(Google_Client::class);
+        $googleClient = $this->createMock(\Google_Client::class);
         $googleClient->expects(self::once())
                      ->method('fetchAccessTokenWithAuthCode')->with('code-ABC')
                      ->willReturn(['id_token' => 'abc.']);
@@ -113,7 +112,7 @@ final class GoogleSSOTest extends TestCase
     /** @test */
     public function fetchAccountDataUsingAuthorizationCode(): void
     {
-        $googleClient = $this->createMock(Google_Client::class);
+        $googleClient = $this->createMock(\Google_Client::class);
         $googleClient->expects(self::once())
                      ->method('fetchAccessTokenWithAuthCode')->with('code-ABC')
                      ->willReturn($this->validToken);
@@ -125,7 +124,7 @@ final class GoogleSSOTest extends TestCase
     /** @test */
     public function doesNotRedundantCreateGoogleClient(): void
     {
-        $googleClient = $this->createMock(Google_Client::class);
+        $googleClient = $this->createMock(\Google_Client::class);
         $googleClient->expects(self::once())->method('setRedirectUri')->with('http://test-server');
         $googleClient->expects(self::once())->method('setAccessType')->with('online');
         $googleClient->expects(self::once())->method('setScopes')->with(['email', 'profile']);

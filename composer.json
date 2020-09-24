@@ -34,12 +34,12 @@
     },
     "autoload": {
         "psr-4": {
-            "GoogleSSO\\": "src"
+            "Waglpz\\GoogleSSO\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "GoogleSSO\\Tests\\": "tests/"
+            "Waglpz\\GoogleSSO\\Tests\\": "tests/"
         }
     },
     "replace": {
