@@ -122,6 +122,32 @@ final class GoogleSSOTest extends TestCase
     }
 
     /** @test */
+    public function getAccessTokenBeforeFetchAccountData(): void
+    {
+        $googleClient = $this->createMock(\Google_Client::class);
+        $googleClient->expects(self::once())
+                     ->method('getAccessToken')
+                     ->willReturn(null);
+        $sso         = new GoogleSSO($this->config, $googleClient);
+        $accessToken = $sso->getAccessToken();
+        self::assertNull($accessToken);
+    }
+
+    /** @test */
+    public function getAccessToken(): void
+    {
+        $googleAccessToken = ['access_token' => '123.access.abc'];
+
+        $googleClient = $this->createMock(\Google_Client::class);
+        $googleClient->expects(self::once())
+                     ->method('getAccessToken')
+                     ->willReturn($googleAccessToken);
+        $sso         = new GoogleSSO($this->config, $googleClient);
+        $accessToken = $sso->getAccessToken();
+        self::assertSame('123.access.abc', $accessToken);
+    }
+
+    /** @test */
     public function doesNotRedundantCreateGoogleClient(): void
     {
         $googleClient = $this->createMock(\Google_Client::class);

@@ -96,4 +96,11 @@ final class GoogleSSO implements GoogleSSOPooreable
 
         return $googleProfileData;
     }
+
+    public function getAccessToken(): ?string
+    {
+        $token = $this->client->getAccessToken();
+
+        return $token['access_token'] ?? null;
+    }
 }
