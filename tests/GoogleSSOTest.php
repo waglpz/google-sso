@@ -13,6 +13,8 @@ final class GoogleSSOTest extends TestCase
     private array $validToken;
     /** @var array<mixed> */
     private array $config;
+    /** @var array<string> */
+    private array $invalidToken;
 
     protected function setUp(): void
     {
@@ -28,6 +30,11 @@ final class GoogleSSOTest extends TestCase
 
         // eyJlbWFpbCI6ICJmcmVkeUBhY21lLmNvbSJ9 base64_encode('{"email": "fredy@acme.com"}')
         $this->validToken = ['id_token' => 'abc.eyJlbWFpbCI6ICJmcmVkeUBhY21lLmNvbSJ9'];
+
+        // eyJlbWFpbCI6ICJncm9zc2VAYWNtZS5jb20iLCAibmFtZSI6ICJHcm/Dn2UifQ==
+        // base64_encode('{"email": "grosse@acme.com", "name": "Große"}')
+        // we cut last "=" and mark invalid
+        $this->invalidToken = ['id_token' => 'abc.eyJlbWFpbCI6ICJncm9zc2VAYWNtZS5jb20iLCAibmFtZSI6ICJHcm/Dn2UifQ='];
     }
 
     /** @test */
@@ -119,6 +126,27 @@ final class GoogleSSOTest extends TestCase
         $sso         = new GoogleSSO($this->config, $googleClient);
         $accountData = $sso->fetchAccountDataUsingAuthorizationCode('code-ABC');
         self::assertSame(['email' => 'fredy@acme.com'], $accountData);
+    }
+
+    /**
+     * @test
+     * @group zzz
+     */
+    public function fetchAccountDataUsingAuthorizationCodeAlsoBase64IsInvalid(): void
+    {
+        $googleClient = $this->createMock(\Google_Client::class);
+        $googleClient->expects(self::once())
+                     ->method('fetchAccessTokenWithAuthCode')->with('code-ABC')
+                     ->willReturn($this->invalidToken);
+        $sso         = new GoogleSSO($this->config, $googleClient);
+        $accountData = $sso->fetchAccountDataUsingAuthorizationCode('code-ABC');
+        self::assertSame(
+            [
+                'email' => 'grosse@acme.com',
+                'name'  => 'Große',
+            ],
+            $accountData
+        );
     }
 
     /** @test */

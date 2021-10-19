@@ -68,7 +68,7 @@ final class GoogleSSO implements GoogleSSOPooreable
         return $googleClient->createAuthUrl();
     }
 
-    /** @return array<mixed> */
+    /** @inheritDoc */
     public function fetchAccountDataUsingAuthorizationCode(string $code): array
     {
         $googleClient = $this->createClient();
@@ -82,8 +82,9 @@ final class GoogleSSO implements GoogleSSOPooreable
             throw new \Error('Unexpected Google Token result.', 500);
         }
 
-        $data              = \base64_decode($tokenData[1], true);
-        $googleProfileData = [];
+        $valideBase64String = $this->prepareBase64($tokenData[1]);
+        $data               = \base64_decode($valideBase64String, true);
+        $googleProfileData  = [];
 
         if ($data !== false) {
             $googleProfileData = \json_decode(
@@ -95,6 +96,17 @@ final class GoogleSSO implements GoogleSSOPooreable
         }
 
         return $googleProfileData;
+    }
+
+    private function prepareBase64(string $base64encodedString): string
+    {
+        $remainder = \strlen($base64encodedString) % 4;
+        if ($remainder !== 0) {
+            $padLength            = 4 - $remainder;
+            $base64encodedString .= \str_repeat('=', $padLength);
+        }
+
+        return \strtr($base64encodedString, '-_', '+/');
     }
 
     public function getAccessToken(): ?string
