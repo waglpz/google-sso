@@ -25,6 +25,12 @@ jobs:
         key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
         restore-keys: |
           ${{ runner.os }}-php-
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.4'
+        coverage: pcov
+        tools: composer:v2
 
     - name: Install dependencies
 #      if: steps.composer-cache.outputs.cache-hit != 'true'
