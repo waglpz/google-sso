@@ -1,5 +1,7 @@
-/.build-output
+/.idea
 /composer.lock
 /phpunit.xml
+/var/
 /vendor/
-/.idea
+!**/.gitignore
+!**/.gitkeep

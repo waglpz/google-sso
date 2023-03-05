@@ -4,7 +4,7 @@ The Google SSO Client Library enables you to work with single sign on via Google
 
 ### Requirements
 
-PHP 7.4 or higher
+PHP 8.2 or higher
 
 ### Installation
 
@@ -25,8 +25,8 @@ composer require waglpz/google-sso:"^1.0"
     $config = include __DIR__ . '/../config/sso.php';
     $googleSSO = new \GoogleSSO\GoogleSSO($config);
     $authorizationCodeUrl = $googleSSO->createAuthUrl();
-    // Go to the $authorizationCodeUrl and select account you will authenticated against.
-    // these will redirect you to defined redirect Uri and on these an php script will use code send from google back.
+    // Go to the $authorizationCodeUrl and select account you will authenticate against.
+    // these will redirect you to defined/known redirect URI and a PHP script will use the code which sends back from Google.
     $accountData = $googleSSO->fetchAccountDataUsingAuthorizationCode($_GET['code']);
     // $accountData contains necessary information if one was founded by google
   ```
@@ -36,35 +36,29 @@ composer require waglpz/google-sso:"^1.0"
 To check for coding style violations, run
 
 ```
-composer cs-check
+composer waglpz:code:style:check
 ```
 
 To automatically fix (fixable) coding style violations, run
 
 ```
-composer cs-fix
+composer waglpz:code:style:fix
 ```
 
 To check for static type violations, run
 
 ```
-composer cs-fix
+waglpz:code:analyse
 ```
 
 To check for regressions, run
 
 ```
-composer test
+composer waglpz:test:norma
 ```
 
 To check all violations at once, run
 
 ```
-composer check
+composer waglpz:check:normal
 ```
-
-
-
-
-
-

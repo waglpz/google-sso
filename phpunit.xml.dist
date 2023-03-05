@@ -1,28 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!-- https://phpunit.de/manual/current/en/appendixes.configuration.html -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
-         testdox="true"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.1/phpunit.xsd"
          colors="true"
-         cacheResult="false"
-         bootstrap="vendor/autoload.php"
-         verbose="true">
-    <testsuites>
-        <testsuite name="all">
-            <directory>tests</directory>
-        </testsuite>
-    </testsuites>
-
-    <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">./src</directory>
-        </whitelist>
-    </filter>
-
-    <logging>
-        <log type="junit" target=".build-output/junit.xml"/>
-        <log type="coverage-html" target=".build-output/coverage"/>
-        <log type="coverage-text" target="php://stdout" showOnlySummary="true"/>
-    </logging>
+         displayDetailsOnTestsThatTriggerDeprecations="true"
+         displayDetailsOnTestsThatTriggerErrors="true"
+         displayDetailsOnTestsThatTriggerWarnings="true"
+         cacheResult="true"
+         bootstrap="vendor/autoload.php" 
+         cacheDirectory="var/.phpunit.cache"
+>
+  <coverage>
+    <report>
+      <html outputDirectory="var/.build-output/coverage"/>
+      <text outputFile="php://stdout" showOnlySummary="true"/>
+    </report>
+  </coverage>
+  <testsuites>
+    <testsuite name="all">
+      <directory>tests</directory>
+    </testsuite>
+  </testsuites>
+  <php>
+    <const name="APP_ENV" value="test"/>
+    <const name="PROJECT_CONFIG_DIRECTORY" value="config"/>
+  </php>
+  <logging>
+    <junit outputFile="var/.build-output/junit.xml"/>
+  </logging>
+  <source>
+    <include>
+      <directory suffix=".php">./src</directory>
+    </include>
+  </source>
 </phpunit>
