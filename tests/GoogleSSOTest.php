@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waglpz\GoogleSSO\Tests;
 
+use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 use Waglpz\GoogleSSO\GoogleSSO;
 
@@ -19,6 +20,7 @@ final class GoogleSSOTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
         $this->config = [
             'redirectUri' => 'http://test-server',
             'accessType'  => 'online',
@@ -37,7 +39,11 @@ final class GoogleSSOTest extends TestCase
         $this->invalidToken = ['id_token' => 'abc.eyJlbWFpbCI6ICJncm9zc2VAYWNtZS5jb20iLCAibmFtZSI6ICJHcm/Dn2UifQ='];
     }
 
-    /** @test */
+    /**
+     * @throws Exception
+     *
+     * @test
+     */
     public function authorizationUrlCreated(): void
     {
         $googleClient = $this->createMock(\Google_Client::class);
@@ -53,10 +59,14 @@ final class GoogleSSOTest extends TestCase
         self::assertSame('authorization-url', $url);
     }
 
-    /** @test */
+    /**
+     * @throws Exception|\JsonException
+     *
+     * @test
+     */
     public function errorUnexpectedResult(): void
     {
-        $this->expectException(\Error::class);
+        $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionCode(500);
         $this->expectExceptionMessage('Unexpected result from Google.');
 
@@ -68,7 +78,11 @@ final class GoogleSSOTest extends TestCase
         $sso->fetchAccountDataUsingAuthorizationCode('code-ABC');
     }
 
-    /** @test */
+    /**
+     * @throws Exception|\JsonException
+     *
+     * @test
+     */
     public function errorConfigurationMethodNotExist(): void
     {
         $methodName = 'WRONG_METHOD_NAME';
@@ -78,8 +92,8 @@ final class GoogleSSOTest extends TestCase
         $this->expectExceptionMessage(
             \sprintf(
                 'Google oauth client can not configured properly, method %s not exist.',
-                'set' . $methodName
-            )
+                'set' . $methodName,
+            ),
         );
 
         $googleClient = $this->createMock(\Google_Client::class);
@@ -87,10 +101,14 @@ final class GoogleSSOTest extends TestCase
         $sso->fetchAccountDataUsingAuthorizationCode('code-ABC');
     }
 
-    /** @test */
+    /**
+     * @throws Exception|\JsonException
+     *
+     * @test
+     */
     public function errorUnexpectedGoogleTokenResult(): void
     {
-        $this->expectException(\Error::class);
+        $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionCode(500);
         $this->expectExceptionMessage('Unexpected Google Token result.');
 
@@ -102,7 +120,11 @@ final class GoogleSSOTest extends TestCase
         $sso->fetchAccountDataUsingAuthorizationCode('code-ABC');
     }
 
-    /** @test */
+    /**
+     * @throws Exception
+     *
+     * @test
+     */
     public function errorJsonDecodeResult(): void
     {
         $this->expectException(\JsonException::class);
@@ -116,7 +138,12 @@ final class GoogleSSOTest extends TestCase
         $sso->fetchAccountDataUsingAuthorizationCode('code-ABC');
     }
 
-    /** @test */
+    /**
+     * @throws Exception
+     * @throws \JsonException
+     *
+     * @test
+     */
     public function fetchAccountDataUsingAuthorizationCode(): void
     {
         $googleClient = $this->createMock(\Google_Client::class);
@@ -129,8 +156,27 @@ final class GoogleSSOTest extends TestCase
     }
 
     /**
+     * @throws Exception
+     * @throws \JsonException
+     *
      * @test
-     * @group zzz
+     */
+    public function fetchAccessTokenWithAuthCode(): void
+    {
+        $googleClient = $this->createMock(\Google_Client::class);
+        $googleClient->expects(self::once())
+                     ->method('fetchAccessTokenWithAuthCode')->with('code-ABC')
+                     ->willReturn($this->validToken);
+        $sso         = new GoogleSSO($this->config, $googleClient);
+        $accountData = $sso->fetchAccessTokenWithAuthCode('code-ABC');
+        self::assertSame(['id_token' => 'abc.eyJlbWFpbCI6ICJmcmVkeUBhY21lLmNvbSJ9'], $accountData);
+    }
+
+    /**
+     * @throws Exception
+     * @throws \JsonException
+     *
+     * @test
      */
     public function fetchAccountDataUsingAuthorizationCodeAlsoBase64IsInvalid(): void
     {
@@ -145,11 +191,15 @@ final class GoogleSSOTest extends TestCase
                 'email' => 'grosse@acme.com',
                 'name'  => 'Große',
             ],
-            $accountData
+            $accountData,
         );
     }
 
-    /** @test */
+    /**
+     * @throws Exception
+     *
+     * @test
+     */
     public function getAccessTokenBeforeFetchAccountData(): void
     {
         $googleClient = $this->createMock(\Google_Client::class);
@@ -161,7 +211,11 @@ final class GoogleSSOTest extends TestCase
         self::assertNull($accessToken);
     }
 
-    /** @test */
+    /**
+     * @throws Exception
+     *
+     * @test
+     */
     public function getAccessToken(): void
     {
         $googleAccessToken = ['access_token' => '123.access.abc'];

@@ -5,33 +5,19 @@ declare(strict_types=1);
 namespace Waglpz\GoogleSSO;
 
 use Google_Client;
-use InvalidArgumentException;
 
 final class GoogleSSO implements GoogleSSOPooreable
 {
-    /** @var  array<string,mixed> */
-    private array $config;
-    private Google_Client $client;
     private bool $initiated;
 
     /** @param array<string,mixed> $config */
-    public function __construct(array $config, ?Google_Client $client = null)
+    public function __construct(private readonly array $config, private Google_Client $client)
     {
         $this->initiated = false;
-        $this->config    = $config;
-        if ($client === null) {
-            return;
-        }
-
-        $this->client = $client;
     }
 
     private function createClient(): Google_Client
     {
-        if (! isset($this->client)) {
-            $this->client = new Google_Client();
-        }
-
         if ($this->initiated === true) {
             return $this->client;
         }
@@ -45,17 +31,18 @@ final class GoogleSSO implements GoogleSSOPooreable
     {
         foreach ($this->config as $name => $value) {
             $methodName = 'set' . \ucfirst($name);
-            if (! \method_exists($this->client, $methodName)) {
-                throw new InvalidArgumentException(
+            $cb         = [$this->client, $methodName];
+            if (! \is_callable($cb)) {
+                throw new \InvalidArgumentException(
                     \sprintf(
                         'Google oauth client can not configured properly, method %s not exist.',
-                        $methodName
+                        $methodName,
                     ),
-                    500
+                    500,
                 );
             }
 
-            $this->client->$methodName($value);
+            \call_user_func_array($cb, [$value]);
         }
 
         $this->initiated = true;
@@ -68,18 +55,22 @@ final class GoogleSSO implements GoogleSSOPooreable
         return $googleClient->createAuthUrl();
     }
 
-    /** @inheritDoc */
+    /**
+     * @throws \JsonException
+     *
+     * @inheritDoc
+     */
     public function fetchAccountDataUsingAuthorizationCode(string $code): array
     {
         $googleClient = $this->createClient();
         $accessToken  = $googleClient->fetchAccessTokenWithAuthCode($code);
         if (! isset($accessToken['id_token'])) {
-            throw new \Error('Unexpected result from Google.', 500);
+            throw new \UnexpectedValueException('Unexpected result from Google.', 500);
         }
 
         $tokenData = \explode('.', $accessToken['id_token']);
         if (! isset($tokenData[1])) {
-            throw new \Error('Unexpected Google Token result.', 500);
+            throw new \UnexpectedValueException('Unexpected Google Token result.', 500);
         }
 
         $valideBase64String = $this->prepareBase64($tokenData[1]);
@@ -91,11 +82,19 @@ final class GoogleSSO implements GoogleSSOPooreable
                 $data,
                 true,
                 512,
-                \JSON_THROW_ON_ERROR
+                \JSON_THROW_ON_ERROR,
             );
         }
 
+        \assert(\is_array($googleProfileData));
+
         return $googleProfileData;
+    }
+
+    /** @inheritDoc */
+    public function fetchAccessTokenWithAuthCode(string $code): array
+    {
+        return $this->createClient()->fetchAccessTokenWithAuthCode($code);
     }
 
     private function prepareBase64(string $base64encodedString): string
@@ -109,7 +108,7 @@ final class GoogleSSO implements GoogleSSOPooreable
         return \strtr($base64encodedString, '-_', '+/');
     }
 
-    public function getAccessToken(): ?string
+    public function getAccessToken(): string|null
     {
         $token = $this->client->getAccessToken();
 
