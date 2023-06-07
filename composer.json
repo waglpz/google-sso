@@ -32,8 +32,8 @@
         "php": "^8.2",
         "ext-json": "*",
         "google/apiclient": "^2.13",
-        "waglpz/webapp": "v2.0.0.x-dev",
-        "waglpz/webapp-security": "v2.0.0.x-dev"
+        "waglpz/webapp": "^v2.0",
+        "waglpz/webapp-security": "^v2.0"
     },
     "require-dev": {
         "doctrine/coding-standard": "^11.1",
