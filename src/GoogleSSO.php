@@ -87,6 +87,7 @@ final class GoogleSSO implements GoogleSSOPooreable
         }
 
         \assert(\is_array($googleProfileData));
+        $googleProfileData['id_token'] = $accessToken['id_token'];
 
         return $googleProfileData;
     }

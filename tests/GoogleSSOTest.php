@@ -152,7 +152,12 @@ final class GoogleSSOTest extends TestCase
                      ->willReturn($this->validToken);
         $sso         = new GoogleSSO($this->config, $googleClient);
         $accountData = $sso->fetchAccountDataUsingAuthorizationCode('code-ABC');
-        self::assertSame(['email' => 'fredy@acme.com'], $accountData);
+
+        $expectation = [
+            'email' => 'fredy@acme.com',
+            'id_token' => 'abc.eyJlbWFpbCI6ICJmcmVkeUBhY21lLmNvbSJ9',
+        ];
+        self::assertSame($expectation, $accountData);
     }
 
     /**
@@ -190,6 +195,7 @@ final class GoogleSSOTest extends TestCase
             [
                 'email' => 'grosse@acme.com',
                 'name'  => 'Große',
+                'id_token' => 'abc.eyJlbWFpbCI6ICJncm9zc2VAYWNtZS5jb20iLCAibmFtZSI6ICJHcm/Dn2UifQ=',
             ],
             $accountData,
         );
