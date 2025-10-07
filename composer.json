@@ -32,7 +32,7 @@
         "php": "^8.2",
         "ext-json": "*",
         "google/apiclient": "^2.13",
-        "waglpz/webapp": "^v2.0",
+        "waglpz/webapp": "^2.0 || dev-php8.3-intermediate",
         "waglpz/webapp-security": "^v2.0"
     },
     "require-dev": {
